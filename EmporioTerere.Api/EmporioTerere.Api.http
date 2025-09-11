@@ -1,0 +1,6 @@
+@EmporioTerere.Api_HostAddress = http://localhost:5279
+
+GET {{EmporioTerere.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
