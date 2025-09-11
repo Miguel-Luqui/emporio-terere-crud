@@ -1,0 +1,32 @@
+name: CD - Publish .NET
+
+# Executa quando houver push no branch main
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Passo 1: Checar o código
+      - uses: actions/checkout@v3
+
+      # Passo 2: Configurar o .NET 8
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+
+      # Passo 3: Restaurar dependências
+      - name: Restore dependencies
+        run: dotnet restore
+
+      # Passo 4: Build do projeto
+      - name: Build
+        run: dotnet build --configuration Release
+
+      # Passo 5: Publicar arquivos (CD)
+      - name: Publish
+        run: dotnet publish -c Release -o ./publish
