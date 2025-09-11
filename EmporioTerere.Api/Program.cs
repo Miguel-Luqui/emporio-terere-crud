@@ -1,22 +1,20 @@
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Configura Kestrel para ouvir na porta 80 em todas as interfaces
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(80); // HTTP
+});
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
-app.UseHttpsRedirection();
+// Configure o Swagger para aparecer sempre, não apenas no Development
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseAuthorization();
 
