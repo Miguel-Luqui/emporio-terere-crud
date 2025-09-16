@@ -18,10 +18,10 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      - name: Restaurar dependências
+      - name: Restaurar dependências da API
         run: dotnet restore EmporioTerere.Api/EmporioTerere.Api/EmporioTerere.Api.csproj
 
-      - name: Build do projeto
+      - name: Build da API
         run: dotnet build EmporioTerere.Api/EmporioTerere.Api/EmporioTerere.Api.csproj --configuration Release
 
   test:
@@ -51,7 +51,7 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      - name: Publicar aplicação (simulação de deploy)
+      - name: Publicar aplicação
         run: dotnet publish EmporioTerere.Api/EmporioTerere.Api/EmporioTerere.Api.csproj -c Release -o ./publish
 
   docker:
@@ -61,5 +61,5 @@ jobs:
       - name: Checkout do código
         uses: actions/checkout@v3
 
-      - name: Build da Docker image da API
+      - name: Build da Docker image
         run: docker build -t emporioterere:latest .
