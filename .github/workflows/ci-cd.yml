@@ -1,17 +1,18 @@
 name: CI/CD Pipeline
 
+# Dispara o workflow em push ou pull_request para o branch principal 'master'
 on:
   push:
-    branches: [ main ]
+    branches: [ master ]
   pull_request:
-    branches: [ main ]
+    branches: [ master ]
 
 jobs:
   build-test-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout código
+      - name: Checkout do código
         uses: actions/checkout@v3
 
       - name: Setup .NET
@@ -22,7 +23,7 @@ jobs:
       - name: Restaurar dependências
         run: dotnet restore
 
-      - name: Build
+      - name: Build do projeto
         run: dotnet build --no-restore --configuration Release
 
       - name: Rodar testes unitários
@@ -31,5 +32,5 @@ jobs:
       - name: Publicar aplicação (simulação de deploy)
         run: dotnet publish -c Release -o ./publish
 
-      - name: Build Docker image
+      - name: Build da Docker image
         run: docker build -t emporioterere:latest .
