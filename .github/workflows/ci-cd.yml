@@ -62,4 +62,4 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Build da Docker image
-        run: docker build -t emporioterere:latest .
+        run: docker build -t emporioterere:latest ./EmporioTerere.Api/EmporioTerere.Api
