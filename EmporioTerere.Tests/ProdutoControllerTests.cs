@@ -1,5 +1,4 @@
 ﻿using Xunit;
-using EmporioTerere.Api.Controllers;
 using EmporioTerere.Api.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
@@ -10,77 +9,84 @@ namespace EmporioTerere.Tests
     {
         private ProdutoController _controller;
 
+        public ProdutoController Controller { get => _controller; set => _controller = value; }
+
         public ProdutoControllerTests()
         {
-            // Criamos uma nova instância para cada teste
             _controller = new ProdutoController();
+
+            // Limpar a lista estática antes de cada teste
+            var produtosField = typeof(ProdutoController)
+                .GetField("produtos", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
+            produtosField?.SetValue(null, new List<Produto>());
         }
 
         [Fact]
-        public void GetAll_DeveRetornarListaVazia_QuandoNaoHaProdutos()
+        public void Create_ProdutoValido_RetornaCreated()
         {
-            var resultado = _controller.GetAll() as OkObjectResult;
+            var produto = new Produto { Nome = "Erva Mate", Preco = 15.50m, Estoque = 10 };
 
-            Assert.NotNull(resultado);
-            var produtos = resultado.Value as List<Produto>;
-            Assert.Empty(produtos);
+            var result = _controller.Create(produto) as CreatedAtActionResult;
+
+            Assert.NotNull(result);
+            var createdProduto = result.Value as Produto;
+            Assert.Equal("Erva Mate", createdProduto.Nome);
+            Assert.Equal(15.50m, createdProduto.Preco);
+            Assert.Equal(10, createdProduto.Estoque);
         }
 
         [Fact]
-        public void Create_DeveAdicionarProdutoERetornarCreated()
+        public void GetAll_ProdutosExistentes_RetornaLista()
         {
-            var novoProduto = new Produto { Nome = "Erva Mate", Preco = 10.5m, Estoque = 20 };
+            _controller.Create(new Produto { Nome = "Erva", Preco = 10, Estoque = 5 });
+            _controller.Create(new Produto { Nome = "Cuia", Preco = 20, Estoque = 3 });
 
-            var resultado = _controller.Create(novoProduto) as CreatedAtActionResult;
+            var result = _controller.GetAll() as OkObjectResult;
+            var produtos = result.Value as List<Produto>;
 
-            Assert.NotNull(resultado);
-            var produtoCriado = resultado.Value as Produto;
-            Assert.NotNull(produtoCriado);
-            Assert.Equal("Erva Mate", produtoCriado.Nome);
-            Assert.Equal(1, produtoCriado.Id);
+            Assert.NotNull(produtos);
+            Assert.Equal(2, produtos.Count);
         }
 
         [Fact]
-        public void GetById_DeveRetornarProduto_SeExistir()
+        public void GetById_ProdutoExistente_RetornaProduto()
         {
-            var novoProduto = new Produto { Nome = "Tereré Natural", Preco = 15.0m, Estoque = 50 };
-            _controller.Create(novoProduto);
+            _controller.Create(new Produto { Nome = "Erva", Preco = 10, Estoque = 5 });
 
-            var resultado = _controller.GetById(1) as OkObjectResult;
+            var result = _controller.GetById(1) as OkObjectResult;
+            var produto = result.Value as Produto;
 
-            Assert.NotNull(resultado);
-            var produto = resultado.Value as Produto;
-            Assert.Equal("Tereré Natural", produto.Nome);
+            Assert.NotNull(produto);
+            Assert.Equal(1, produto.Id);
+            Assert.Equal("Erva", produto.Nome);
         }
 
         [Fact]
-        public void Update_DeveAtualizarProdutoExistente()
+        public void Update_ProdutoExistente_AtualizaValores()
         {
-            var produto = new Produto { Nome = "Tereré Menta", Preco = 12.0m, Estoque = 10 };
-            _controller.Create(produto);
+            _controller.Create(new Produto { Nome = "Erva", Preco = 10, Estoque = 5 });
 
-            var atualizado = new Produto { Nome = "Tereré Menta Gelada", Preco = 13.0m, Estoque = 15 };
-            var resultado = _controller.Update(1, atualizado);
+            var produtoAtualizado = new Produto { Nome = "Erva Premium", Preco = 20, Estoque = 15 };
+            var result = _controller.Update(1, produtoAtualizado);
 
-            Assert.IsType<NoContentResult>(resultado);
+            Assert.IsType<NoContentResult>(result);
 
-            var resultadoGet = _controller.GetById(1) as OkObjectResult;
-            var produtoAtualizado = resultadoGet.Value as Produto;
-            Assert.Equal("Tereré Menta Gelada", produtoAtualizado.Nome);
+            var updated = (_controller.GetById(1) as OkObjectResult).Value as Produto;
+            Assert.Equal("Erva Premium", updated.Nome);
+            Assert.Equal(20, updated.Preco);
+            Assert.Equal(15, updated.Estoque);
         }
 
         [Fact]
-        public void Delete_DeveRemoverProdutoExistente()
+        public void Delete_ProdutoExistente_RemoveProduto()
         {
-            var produto = new Produto { Nome = "Tereré Abacaxi", Preco = 20.0m, Estoque = 5 };
-            _controller.Create(produto);
+            _controller.Create(new Produto { Nome = "Erva", Preco = 10, Estoque = 5 });
 
-            var resultado = _controller.Delete(1);
+            var result = _controller.Delete(1);
+            Assert.IsType<NoContentResult>(result);
 
-            Assert.IsType<NoContentResult>(resultado);
-
-            var resultadoGet = _controller.GetById(1);
-            Assert.IsType<NotFoundResult>(resultadoGet);
+            var getResult = _controller.GetById(1) as NotFoundResult;
+            Assert.NotNull(getResult);
         }
     }
 }

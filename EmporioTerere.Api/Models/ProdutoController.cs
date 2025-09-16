@@ -1,13 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using EmporioTerere.Api.Models;
 
-namespace EmporioTerere.Api.Controllers
+namespace EmporioTerere.Api.Models
 {
     [ApiController]
     [Route("api/[controller]")]
     public class ProdutoController : ControllerBase
     {
-        private static List<Produto> produtos = new List<Produto>();
+        private static List<Produto> produtos = [];
+
+        public static List<Produto> Produtos { get => produtos; set => produtos = value; }
 
         [HttpGet]
         public IActionResult GetAll() => Ok(produtos);
