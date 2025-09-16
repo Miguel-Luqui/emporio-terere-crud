@@ -1,6 +1,5 @@
 name: CI/CD Pipeline
 
-# Dispara o workflow em push ou pull_request para o branch principal 'master'
 on:
   push:
     branches: [ master ]
@@ -8,9 +7,8 @@ on:
     branches: [ master ]
 
 jobs:
-  build-test-deploy:
+  build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout do código
         uses: actions/checkout@v3
@@ -26,11 +24,42 @@ jobs:
       - name: Build do projeto
         run: dotnet build --no-restore --configuration Release
 
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+
       - name: Rodar testes unitários
         run: dotnet test --no-build --configuration Release --verbosity normal
 
+  publish:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+
       - name: Publicar aplicação (simulação de deploy)
         run: dotnet publish -c Release -o ./publish
+
+  docker:
+    needs: publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v3
 
       - name: Build da Docker image
         run: docker build -t emporioterere:latest .
