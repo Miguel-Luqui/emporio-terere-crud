@@ -1,0 +1,35 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-test-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restaurar dependências
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
+
+      - name: Rodar testes unitários
+        run: dotnet test --no-build --configuration Release --verbosity normal
+
+      - name: Publicar aplicação (simulação de deploy)
+        run: dotnet publish -c Release -o ./publish
+
+      - name: Build Docker image
+        run: docker build -t emporioterere:latest .
