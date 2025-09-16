@@ -36,7 +36,7 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Rodar testes unitários
-        run: dotnet test EmporioTerere.Api/EmporioTerere.Tests/EmporioTerere.Tests.csproj --no-build --configuration Release --verbosity normal
+        run: dotnet test EmporioTerere.Tests/EmporioTerere.Tests.csproj --no-build --configuration Release --verbosity normal
 
   publish:
     needs: test
