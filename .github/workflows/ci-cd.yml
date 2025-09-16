@@ -21,8 +21,8 @@ jobs:
       - name: Restaurar dependências
         run: dotnet restore
 
-      - name: Build do projeto
-        run: dotnet build --no-restore --configuration Release
+      - name: Build da Docker image
+        run: docker build -t emporioterere:latest ./EmporioTerere.Api
 
   test:
     needs: build
